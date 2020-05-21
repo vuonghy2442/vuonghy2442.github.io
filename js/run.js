@@ -2,6 +2,7 @@ const svg_tick = '<g fill-rule="evenodd"><path d="M12 20c-4.411 0-8-3.589-8-8s3.
 const svg_tick_fill = '<path fill-rule="evenodd" d="M10.9854 15.0752l-3.546-3.58 1.066-1.056 2.486 2.509 4.509-4.509 1.06 1.061-5.575 5.575zm1.015-12.075c-4.963 0-9 4.037-9 9s4.037 9 9 9 9-4.037 9-9-4.037-9-9-9z"></path>';
 
 document.body.addEventListener("click", handleClick);
+document.body.addEventListener("dblclick", handleDoubleClick);
 document.body.addEventListener("keyup", handleEnter);
 
 const listTemplate = document.getElementById("list-template").content;
@@ -56,6 +57,18 @@ function load() {
     }
 }
 
+function handleDoubleClick(e) {
+    console.log("Double click");
+    if (e.target.closest(".editable-text")) {
+        if (editingTask) {
+            e.preventDefault();
+            e.stopPropagation();
+            alert("Please complete the current edit");
+            return;
+        }
+        handleEdit(e);
+    }
+}
 function handleClick(e) {
     console.log("I'm here");
     if (e.target.closest(".btn-add")) {
