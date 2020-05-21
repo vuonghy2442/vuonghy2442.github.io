@@ -5,12 +5,14 @@ document.body.addEventListener("click", handleClick);
 document.body.addEventListener("keypress", handleEnter);
 
 const listTemplate = document.getElementById("list-template").content;
-const itemTemplate = listTemplate.querySelector(".task:not(.completed-task)");
+const itemTemplate = document.getElementById("item-template").content;
 //document.body.append(listTemplate.firstElementChild);
 
 const addListButton = document.getElementById("btn-add-list").parentNode;
+var mainTodoList =  document.getElementById("todo-list")
 
 var editingTask = null;
+var deletingItem = null;
 
 function createAList(title) {
     var newList = document.importNode(
@@ -19,11 +21,9 @@ function createAList(title) {
     );
     console.log(addListButton.nextElementSibling);
     newList.lastElementChild.getElementsByClassName("list-title")[0].innerText = title;
-    document.body.insertBefore(newList, addListButton.nextElementSibling); 
+    mainTodoList.prepend(newList);
 }
 
-createAList("abc");
-createAList("xyz");
 function handleEnter(e) {
     if (e.code != "Enter")
         return;
@@ -37,14 +37,37 @@ function handleEnter(e) {
     }
 }
 
+function save() {
+    localStorage.setItem("todoList", mainTodoList.innerHTML);
+}
+
+function clearSave() {
+    localStorage.removeItem("todoList");
+}
+
+function load() {
+    var saved = localStorage.getItem("todoList");
+    console.log(saved);
+    if (!saved) {  
+        createAList("abc");
+        createAList("xyz");
+    } else {
+        mainTodoList.innerHTML = saved; 
+    }
+}
+
 function handleClick(e) {
     console.log("I'm here");
     if (e.target.closest(".btn-add")) {
         handleAdd(e);
         return;
     } 
+    console.log(e);
     
+
     if (editingTask && (e.target.closest(".btn-edit") || e.target.closest(".btn-delete"))) {
+        e.preventDefault();
+        e.stopPropagation();
         alert("Please complete the current edit");
         return;
     }
@@ -53,40 +76,57 @@ function handleClick(e) {
         handleCheck(e);
     } else if (e.target.closest(".btn-delete")) {
         handleDelete(e);
+    } else if(e.target.closest("#btn-del-confirm")){
+        handleConfirmedDelete(e);
     } else if (e.target.closest(".btn-edit")) {
         handleEdit(e);
     } else if (e.target.closest(".btn-collapse")) {
         handleCollapse(e);
     } else if (e.target.closest("#btn-add-list")) {
-        createAList("Test")
+        createAList("Untitled");
     }
 }
 
+
 function handleDelete(e) {
     console.log("Click on delete");
-    var item = e.target.closest("li");
-    item.remove();
+    deletingItem = e.target.closest("li");
+    var text;
+    if (deletingItem) {
+        text = "Delete the task?";
+    } else {
+        deletingItem = e.target.closest(".card");
+        text = "Delete the whole card?";
+    }
+    document.getElementById("modal-text").innerHTML = text;
+
+}
+
+function handleConfirmedDelete(e) {
+    deletingItem.remove();
+    save();
 }
 
 function handleEdit(e) {
     console.log("Click on edit");
 
     editingTask = e.target;
-    var item = e.target.closest("li");
-    var textSpan = item.getElementsByClassName("task-text")[0];
+    var item = e.target.closest(".form-row");
+    var textSpan = item.getElementsByClassName("editable-text")[0];
     var text = textSpan.innerText;
     textSpan.innerHTML= '<input class="form-control task-edit" type="text">';
-    var newInput = textSpan.getElementsByClassName("task-edit")[0];
+    var newInput = textSpan.firstElementChild;
     newInput.focus();
     newInput.value = text;
 }
 
 function handleFinishEdit(e) {
     console.log("Done edit");
-    var item = e.target.closest("li");
+    var item = e.target.closest(".form-row");
     var text = item.getElementsByClassName("task-edit")[0].value;
-    item.getElementsByClassName("task-text")[0].innerText= text;
+    item.getElementsByClassName("editable-text")[0].innerText= text;
     editingTask = null;
+    save();
 }
 
 function createItem(add_item, task) {
@@ -95,10 +135,10 @@ function createItem(add_item, task) {
     var newNode = document.importNode(
         itemTemplate,
         true
-    );
+    ).firstElementChild;
 
     console.log(task);
-    newNode.getElementsByClassName("task-text")[0].innerText = task;
+    newNode.getElementsByClassName("editable-text")[0].innerText = task;
     add_item.parentNode.insertBefore(newNode, add_item.nextElementSibling);
 }
 
@@ -106,10 +146,13 @@ function handleAdd(e) {
     console.log("Click on add");
     var add_item = e.target.closest("li");
     var inp = add_item.getElementsByTagName("input")[0];
-    if (inp.value !== "") {
-        createItem(add_item, inp.value);
-        inp.value = "";
-    }
+
+    if (inp.value === "")
+        return;
+
+    createItem(add_item, inp.value);
+    inp.value = "";
+    save();
 }
 
 function handleCollapse(e) {
@@ -123,6 +166,7 @@ function handleCollapse(e) {
         task.classList.toggle("collapse");
     }
     btn.setAttribute("aria-expanded", !expanded);
+    save();
 }
 
 function markUncomplete(list, complete, item) {
@@ -155,6 +199,9 @@ function handleCheck(e) {
     }
 
     console.log(list);
-
     console.log(complete);
+    save();
 }
+
+//clearSave();
+load();

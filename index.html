@@ -1,87 +1,120 @@
 <!doctype html>
 <html lang="en">
-  <head>
-    <!-- Required meta tags -->
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <head>
+        <!-- Required meta tags -->
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
-    <!-- Bootstrap CSS -->
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css" integrity="sha384-9aIt2nRpC12Uk9gS9baDl411NQApFmC26EwAOH8WgZl5MYYxFfc+NcPb1dKGj7Sk" crossorigin="anonymous">
-    <!-- Icon -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
-    <!-- My css -->
-    <link rel="stylesheet" href="css/style.css"/>
-    <title>To do</title>
-  </head>
-  <body>
-    <div id="header" class="container-fluid">
-        <h1>To do list, by me</h1>
-    </div>
-
-    <br>
-    <template id="list-template">
-        <br>
-        <div class="container mg-sm" id="full-list">
-            <div class="card">
-                <div class="card-header">
-                    <span class="list-title">
-                        Today's list    
-                    </span>
+        <!-- Bootstrap CSS -->
+        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css" integrity="sha384-9aIt2nRpC12Uk9gS9baDl411NQApFmC26EwAOH8WgZl5MYYxFfc+NcPb1dKGj7Sk" crossorigin="anonymous">
+        <!-- Icon -->
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+        <!-- My css -->
+        <link rel="stylesheet" href="css/style.css"/>
+        <title>To do</title>
+    </head>
+    <template id="item-template">
+        <li class="list-group-item show task">
+            <div class="form-row align-items-center">
+                <div class="col-auto">
+                    <svg class="checkbox" focusable="false" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><g fill-rule="evenodd"><path d="M12 20c-4.411 0-8-3.589-8-8s3.589-8 8-8 8 3.589 8 8-3.589 8-8 8m0-17c-4.963 0-9 4.037-9 9s4.037 9 9 9 9-4.037 9-9-4.037-9-9-9"></path><path display="none" d="M10.9902 13.3027l-2.487-2.51-.71.704 3.193 3.224 5.221-5.221-.707-.707z"></path></g></svg>
                 </div>
-                <ul class="list-group list-group-flush">
-                    <li class="list-group-item">
-                        <div class="form-row align-items-center">
-                            <div class="col-auto">
-                                <button class="btn btn-primary btn-sm btn-add" type="button" data-toggle="tooltip" data-placement="top" title="Add a new task"><i class="fa fa-plus"></i></button>
-                            </div>
-                            <div class="col">
-                                <input type="text" class="form-control task-input" placeholder="Your new task?"/>
-                            </div>
-                        </div>
-                    </li>
-
-                    <li class="list-group-item show task">
-                        <div class="form-row align-items-center">
-                            <div class="col-auto">
-                                <svg class="checkbox" focusable="false" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><g fill-rule="evenodd"><path d="M12 20c-4.411 0-8-3.589-8-8s3.589-8 8-8 8 3.589 8 8-3.589 8-8 8m0-17c-4.963 0-9 4.037-9 9s4.037 9 9 9 9-4.037 9-9-4.037-9-9-9"></path><path display="none" d="M10.9902 13.3027l-2.487-2.51-.71.704 3.193 3.224 5.221-5.221-.707-.707z"></path></g></svg>
-                            </div>
-                            <div class="col">
-                                <span class="task-text">
-                                    Still need to do task here
-                                </span>
-                            </div>  
-                            <div class="col-auto button-group">
-                                <button class="btn btn-outline-primary btn-sm btn-edit" type="button" data-toggle="tooltip" data-placement="top" title="Edit"><i class="fa fa-edit"></i></button>
-                                <button class="btn btn-outline-danger btn-sm btn-delete" type="button" data-toggle="tooltip" data-placement="top" title="Delete"><i class="fa fa-trash"></i></button>
-                            </div>
-                        </div>
-                    </li>
-
-                    <li class="list-group-item complete-collapse">
-                        <h2 class="mb-0">
-                            <button class="btn btn-block text-left btn-collapse" type="button" aria-expanded="true" data-target=".completed-task">
-                                <b>Hide completed tasks</b>
-                            </button>
-                        </h2>
-                    </li>
-
-                </ul>
-                
+                <div class="col">
+                    <span class="editable-text">
+                        A task here
+                    </span>
+                </div>  
+                <div class="col-auto button-group">
+                    <button class="btn btn-outline-primary btn-sm btn-edit" type="button" data-toggle="tooltip" data-placement="top" title="Edit"><i class="fa fa-edit"></i></button>
+                    <button class="btn btn-outline-danger btn-sm btn-delete" type="button" data-toggle="modal" data-target="#confirm-delete" data-placement="top" title="Delete"><i class="fa fa-trash"></i></button>
+                </div>
             </div>
+        </li>
+    </template>
+    <template id="list-template">
+        <div class="card">
+            <div class="card-header">
+                <div class="form-row align-items-center">
+                    <div class="col">
+                        <span class="list-title editable-text">
+                            List's titel
+                        </span>
+                    </div>  
+                    <div class="col-auto button-group">
+                        <button class="btn btn-outline-primary btn-sm btn-edit" type="button" data-toggle="tooltip" data-placement="top" title="Edit"><i class="fa fa-edit"></i></button>
+                        <button class="btn btn-outline-danger btn-sm btn-delete" type="button" data-toggle="modal" data-target="#confirm-delete" data-placement="top" title="Delete"><i class="fa fa-trash"></i></button>
+                    </div>
+                </div>
+            </div>
+            <ul class="list-group list-group-flush">
+                <li class="list-group-item">
+                    <div class="form-row align-items-center">
+                        <div class="col-auto">
+                            <button class="btn btn-primary btn-sm btn-add" type="button" data-toggle="tooltip" data-placement="top" title="Add a new task"><i class="fa fa-plus"></i></button>
+                        </div>
+                        <div class="col">
+                            <input type="text" class="form-control task-input" placeholder="Your new task?"/>
+                        </div>
+                    </div>
+                </li>
+
+                <li class="list-group-item complete-collapse">
+                    <h2 class="mb-0">
+                        <button class="btn btn-block text-left btn-collapse" type="button" aria-expanded="true" data-target=".completed-task">
+                            <b>Hide completed tasks</b>
+                        </button>
+                    </h2>
+                </li>
+
+            </ul>
+            
         </div>
     </template>
 
-    <div class="container align-items-center">
-        <button id="btn-add-list" class="btn btn-primary">
-            Add new list
-        </button>
-    </div>
+    <body>
+        <div id="header" class="container-fluid">
+            <h1>To do list, by me</h1>
+        </div>
 
-    <!-- Optional JavaScript -->
-    <!-- jQuery first, then Popper.js, then Bootstrap JS -->
-    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>
-    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js" integrity="sha384-OgVRvuATP1z7JjHLkuOU7Xw704+h835Lr+6QL9UvYjZE3Ipu6Tp75j7Bh/kR0JKI" crossorigin="anonymous"></script>
-    <script src="js/run.js"></script>
-</body>
+        <br>
+        
+        <div class="container align-items-center">
+            <button id="btn-add-list" class="btn btn-primary">
+                Add new list
+            </button>
+        </div>
+
+        <div class="container" id = "todo-list">
+
+        </div>
+        
+        <!-- Modal -->
+        <div class="modal fade" id="confirm-delete" data-backdrop="static" data-keyboard="false" tabindex="-1" role="dialog" aria-labelledby="confirm-delete-label" aria-hidden="true">
+            <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                <h5 class="modal-title" id="confirm-delete-label">Confirmation</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+                </div>
+                <div id="modal-text" class="modal-body">
+                    Delete?
+                </div>
+                <div class="modal-footer">
+                <button type="button" class="btn btn-primary" data-dismiss="modal">Cancel</button>
+                <button type="button" id="btn-del-confirm" data-dismiss="modal" class="btn btn-danger">OK</button>
+                </div>
+            </div>
+            </div>
+        </div>
+
+
+        <!-- Optional JavaScript -->
+        <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+        <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>
+        <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
+        <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js" integrity="sha384-OgVRvuATP1z7JjHLkuOU7Xw704+h835Lr+6QL9UvYjZE3Ipu6Tp75j7Bh/kR0JKI" crossorigin="anonymous"></script>
+        <script src="js/run.js"></script>
+    </body>
 </html>
