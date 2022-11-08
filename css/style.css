@@ -1,0 +1,23 @@
+#header {
+    background-color: #ff7f50;
+    min-height: 100px;
+    display:flex;
+    align-items: center;
+    justify-content: center;
+}
+
+#header h1 {
+    color: white;
+}
+
+.row {
+    padding: 1px 0px;
+}
+
+.button-group {
+    float: right;
+}
+
+#btn-compute {
+    width: 100%;
+}
