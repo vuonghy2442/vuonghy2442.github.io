@@ -6,6 +6,7 @@ valueM = document.getElementById("m-value")
 
 const resultTemplate = document.getElementById("result-template").content;
 const resultList = document.getElementById("result-list");
+const filterResult = document.getElementById("filter-result");
 
 const EPSILON = 1e-5;
 
@@ -13,6 +14,8 @@ const EPSILON = 1e-5;
 const CONV = 82 / 45 / 2;
 // distance between the two
 const DIST = 250;
+
+const DIST_CONV = DIST / CONV;
 
 const MAIN_RATIO = 6;
 
@@ -51,20 +54,19 @@ function enoughGear(n, count_map) {
 }
 
 function feasible(n, count_map) {
-    let r = n.map(x => CONV * x);
-    let [a, b] = [r[0] + r[1], r[2] + r[3]];
+    let [a, b] = [n[0] + n[1], n[2] + n[3]];
 
-    if (r[1] + EPSILON > b || r[2] + EPSILON > a || !isTriangle(a, b, DIST)) return false;
+    if (n[1] > b || n[2] > a || !isTriangle(a, b, DIST_CONV)) return false;
     if (!enoughGear(n, count_map)) return false;
     return true;
 }
 
-function findFeasible(class_a, class_b, count_map) {
+function findFeasible(class_a, class_b, count_map, is_filter) {
     res = []
     class_a.forEach(a => {
         class_b.forEach(b => {
             const n = a.concat(b);
-            if (feasible(n, count_map)) {
+            if (!is_filter || feasible(n, count_map)) {
                 res.push(n);
             }
         })
@@ -81,10 +83,9 @@ function createItem(result) {
 
 
     let angle = result[2].map(x => {
-        const a = CONV * (x[0] + x[1]);
-        const b = DIST;
-        const c = CONV * (x[2] + x[3]);
-        return computeAngle(a, b, c) / Math.PI * 180;
+        const a = (x[0] + x[1]);
+        const c = (x[2] + x[3]);
+        return computeAngle(a, DIST_CONV, c) / Math.PI * 180;
     })
 
     newNode.getElementsByClassName("result-conf")[0].innerText = result[2].map(a => simplify(a).join(",")).join("\n");
@@ -110,6 +111,7 @@ function handleClick(e) {
     const M = parseFloat(valueM.value.trim()) / MAIN_RATIO;
     const possible_sum = [];
     const count_map = Object.fromEntries(Rs);
+    const is_filter = filterResult.checked;
 
     Rs.forEach(r1 => {
         Rs.forEach(r2 => {
@@ -143,7 +145,7 @@ function handleClick(e) {
 
         let check = (pos) => {
             let [rb, class_b] = ratio_classes[pos];
-            let sol = findFeasible(class_a, class_b, count_map);
+            let sol = findFeasible(class_a, class_b, count_map, is_filter);
             if (sol.length) {
                 let error = Math.abs(ra * rb / M - 1);
                 res.push([error, ra * rb * MAIN_RATIO, sol]);
