@@ -14,32 +14,57 @@ const CONV = 82 / 45 / 2;
 // distance between the two
 const DIST = 250;
 
-const MAXIMUM_ERROR = 0.01;
-
 const MAIN_RATIO = 6;
 
 function isTriangle(a, b, c) {
-    return a + b >= c + EPSILON && a + c >= b + EPSILON && b + c >= a + EPSILON;
+    return a + b >= c && a + c >= b && b + c >= a;
 }
 
 function computeAngle(a, b, c) {
     return Math.acos((a * a + b * b - c * c) / (2 * a * b));
 }
 
-function feasible(n) {
+function simplify(n) {
+    if (n.length == 4 && n[1] === n[2]) {
+        return [n[0], n[1], n[3]];
+    } else {
+        return n;
+    }
+}
+
+function uniqueCount(arr) {
+    const counts = {};
+    for (var i = 0; i < arr.length; i++) {
+        counts[arr[i]] = 1 + (counts[arr[i]] || 0);
+    }
+    return counts;
+}
+
+function enoughGear(n, count_map) {
+    const n_s = uniqueCount(simplify(n));
+    for (const [ni, size] of Object.entries(n_s)) {
+        if (!(ni in count_map) || count_map[ni] < size) {
+            return false;
+        }
+    }
+    return true;
+}
+
+function feasible(n, count_map) {
     let r = n.map(x => CONV * x);
     let [a, b] = [r[0] + r[1], r[2] + r[3]];
 
     if (r[1] + EPSILON > b || r[2] + EPSILON > a || !isTriangle(a, b, DIST)) return false;
+    if (!enoughGear(n, count_map)) return false;
     return true;
 }
 
-function findFeasible(class_a, class_b) {
+function findFeasible(class_a, class_b, count_map) {
     res = []
     class_a.forEach(a => {
         class_b.forEach(b => {
             const n = a.concat(b);
-            if (feasible(n)) {
+            if (feasible(n, count_map)) {
                 res.push(n);
             }
         })
@@ -62,21 +87,33 @@ function createItem(result) {
         return computeAngle(a, b, c) / Math.PI * 180;
     })
 
-    newNode.getElementsByClassName("result-conf")[0].innerText = result[2].map(a => a.join(",")).join("\n");
+    newNode.getElementsByClassName("result-conf")[0].innerText = result[2].map(a => simplify(a).join(",")).join("\n");
     newNode.getElementsByClassName("result-angle")[0].innerText = angle.map(x => x.toFixed(2) + "°").join("\n");
     newNode.getElementsByClassName("result-size")[0].innerText = result[1].toFixed(8);
     newNode.getElementsByClassName("result-error")[0].innerText = (result[0] * 100).toFixed(4) + "%";
     resultList.appendChild(newNode);
 }
 
+function parseR(str) {
+    return str.split(',').map((x) => {
+        const val = x.split('x');
+        if (val.length == 2) {
+            return val.map(x => parseInt(x.trim()));
+        } else {
+            return [parseInt(val[0].trim()), 1];
+        }
+    })
+}
+
 function handleClick(e) {
-    const Rs = listR.value.split(',').map((x) => parseFloat(x.trim()));
+    const Rs = parseR(listR.value);
     const M = parseFloat(valueM.value.trim()) / MAIN_RATIO;
     const possible_sum = [];
+    const count_map = Object.fromEntries(Rs);
 
     Rs.forEach(r1 => {
         Rs.forEach(r2 => {
-            possible_sum.push([r1 / r2, [r1, r2]]);
+            possible_sum.push([r1[0] / r2[0], [r1[0], r2[0]]]);
         })
     });
 
@@ -106,7 +143,7 @@ function handleClick(e) {
 
         let check = (pos) => {
             let [rb, class_b] = ratio_classes[pos];
-            let sol = findFeasible(class_a, class_b);
+            let sol = findFeasible(class_a, class_b, count_map);
             if (sol.length) {
                 let error = Math.abs(ra * rb / M - 1);
                 res.push([error, ra * rb * MAIN_RATIO, sol]);
