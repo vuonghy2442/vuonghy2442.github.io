@@ -12,7 +12,7 @@ const EPSILON = 1e-5;
 
 // conversion to radius
 const CONV = 82 / 45 / 2;
-// distance between the two
+// distance between the two (mm)
 const DIST = 250;
 
 const DIST_CONV = DIST / CONV;
@@ -53,12 +53,9 @@ function enoughGear(n, count_map) {
     return true;
 }
 
-function feasible(n, count_map) {
+function feasible(n) {
     let [a, b] = [n[0] + n[1], n[2] + n[3]];
-
-    if (n[1] > b || n[2] > a || !isTriangle(a, b, DIST_CONV)) return false;
-    if (!enoughGear(n, count_map)) return false;
-    return true;
+    return n[1] <= b && n[2] <= a && isTriangle(a, b, DIST_CONV);
 }
 
 function findFeasible(class_a, class_b, count_map, is_filter) {
@@ -66,7 +63,8 @@ function findFeasible(class_a, class_b, count_map, is_filter) {
     class_a.forEach(a => {
         class_b.forEach(b => {
             const n = a.concat(b);
-            if (!is_filter || feasible(n, count_map)) {
+            if (!enoughGear(n, count_map)) return;
+            if (!is_filter || feasible(n)) {
                 res.push(n);
             }
         })
