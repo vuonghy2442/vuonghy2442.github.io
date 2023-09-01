@@ -123,7 +123,7 @@ function parseR(str) {
         }
 
         if (!Number.isFinite(res[0]) || res[0] <= 0) throw new Error("Invalid gear size")
-        if (!Number.isInteger(res[1])) throw new Error("The number of gears must be integers")
+        if (!Number.isInteger(res[1]) || res[1] <= 0) throw new Error("The number of gear must be positive integer")
         return res;
     })
 }
