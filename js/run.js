@@ -10,14 +10,33 @@ const filterResult = document.getElementById("filter-result");
 
 const EPSILON = 1e-5;
 
-// conversion to radius
+// conversion to radius (mm)
+// 82-tooth gear => diameter of 45 (mm)
+// n-tooth gear => radius of n / CONV (mm)
 const CONV = 82 / 45 / 2;
-// distance between the two (mm)
+
+// distance between the two further gear (mm)
 const DIST = 250;
 
+// final check only depends on this constant (no unit)
 const DIST_CONV = DIST / CONV;
 
+// convert gear ratio into the linear movement length (mm)
+// one final gear cycle would move about 6 (mm)
 const MAIN_RATIO = 6;
+
+// there're two configuration with 4 gears/3 gears
+// With 4 gears:
+// g1       | g1 in contact with gear g2
+// g2 -- g3 | these two gear g2, g3 turns together, with same rotational speed
+//       g4 | g3 in contact with gear g4
+// With 3 gears:
+// g1
+// g2 == g3 | basically the special case where g2 == g3 
+// g4
+
+// final gear ratio is g1/g2 * g3/g4 (where gi is the number of tooth in ith gear)
+
 
 function isTriangle(a, b, c) {
     return a + b >= c && a + c >= b && b + c >= a;
