@@ -96,17 +96,33 @@ function createItem(result) {
 function parseR(str) {
     return str.split(',').map((x) => {
         const val = x.split('x');
+        let res;
         if (val.length == 2) {
-            return val.map(x => parseInt(x.trim()));
+            res = val.map(x => Number(x.trim().replace(',', '.')));
         } else {
-            return [parseInt(val[0].trim()), 1];
+            res = [Number(val[0].trim().replace(',', '.')), 1];
         }
+
+        if (!Number.isFinite(res[0]) || res[0] <= 0) throw new Error("Invalid gear size")
+        if (!Number.isInteger(res[1])) throw new Error("The number of gears must be integers")
+        return res;
     })
 }
 
 function handleClick(e) {
-    const Rs = parseR(listR.value);
-    const M = parseFloat(valueM.value.trim()) / MAIN_RATIO;
+    let Rs;
+    try {
+        Rs = parseR(listR.value);
+    } catch (err) {
+        alert("Danh sách R không hợp lệ");
+        return;
+    }
+    const M = Number(valueM.value.trim().replace(',', '.')) / MAIN_RATIO;
+    if (!Number.isFinite(M) || M <= 0) {
+        alert("Giá trị của M không hợp lệ");
+        return;
+    }
+
     const possible_sum = [];
     const count_map = Object.fromEntries(Rs);
     const is_filter = filterResult.checked;
